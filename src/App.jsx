@@ -267,8 +267,8 @@ function LoginPage({ onStudentLogin, onAdminLogin, loading }) {
               className="h-12 object-contain"
             />
           </div>
-          <h1 className="text-3xl font-bold text-red-600 mb-2">Login untuk mengerjakan</h1>
-          <p className="text-gray-600">Tes Evaluasi Bulanan</p>
+          <h1 className="text-3xl font-bold text-red-600 mb-2">Tes Evaluasi</h1>
+          <p className="text-gray-600">Jangan takut salah, takutlah kalau kamu tidak mencoba sama sekali.</p>
         </div>
 
         <div>
