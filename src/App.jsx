@@ -351,7 +351,7 @@ function AdminDashboard({ exams, onSaveExam, onDeleteExam, onLogout, loading }) 
     <div className="min-h-screen bg-gray-100">
       <div className="bg-red-600 text-white p-6 shadow-lg">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Dashboard Admin</h1>
+          <h1 className="text-2xl font-bold">Bubat Hebat</h1>
           <button
             onClick={onLogout}
             className="flex items-center gap-2 bg-white text-red-600 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
@@ -369,7 +369,7 @@ function AdminDashboard({ exams, onSaveExam, onDeleteExam, onLogout, loading }) 
             className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition flex items-center gap-2"
           >
             <Plus className="w-5 h-5" />
-            Buat Ujian Baru
+            Buat Tes Baru
           </button>
         </div>
 
@@ -382,7 +382,7 @@ function AdminDashboard({ exams, onSaveExam, onDeleteExam, onLogout, loading }) 
               <div className="grid md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">
-                    Nama Ujian
+                    Nama Tes
                   </label>
                   <input
                     type="text"
@@ -481,9 +481,9 @@ function AdminDashboard({ exams, onSaveExam, onDeleteExam, onLogout, loading }) 
         )}
 
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-xl font-bold text-red-600 mb-4">Daftar Ujian</h2>
+          <h2 className="text-xl font-bold text-red-600 mb-4">Daftar Tes</h2>
           {exams.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">Belum ada ujian dibuat</p>
+            <p className="text-gray-500 text-center py-8">Belum ada tes yang dibuat</p>
           ) : (
             <div className="space-y-3">
               {exams.map((exam, idx) => (
@@ -578,14 +578,14 @@ function ExamList({ userData, exams, onStartExam, onLogout }) {
 
       <div className="max-w-4xl mx-auto p-6">
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-xl font-bold text-red-600 mb-4">Pilih Ujian</h2>
+          <h2 className="text-xl font-bold text-red-600 mb-4">Pilih Tes</h2>
           {loading ? (
             <div className="text-center py-8">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
-              <p className="text-gray-500 mt-2">Memuat data ujian...</p>
+              <p className="text-gray-500 mt-2">Memuat data tes...</p>
             </div>
           ) : exams.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">Belum ada ujian tersedia</p>
+            <p className="text-gray-500 text-center py-8">Belum ada tes yang tersedia</p>
           ) : (
             <div className="space-y-3">
               {exams.map((exam, idx) => {
@@ -701,7 +701,7 @@ function ResultPage({ result, examName, onBackToList }) {
           <CheckCircle className="w-16 h-16 text-green-600" />
         </div>
         
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">Ujian Selesai!</h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">Tes Selesai!</h1>
         <p className="text-gray-600 mb-6">{examName}</p>
         
         <div className="bg-red-50 rounded-lg p-6 mb-6">
@@ -717,7 +717,7 @@ function ResultPage({ result, examName, onBackToList }) {
           onClick={onBackToList}
           className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition"
         >
-          Kembali ke Daftar Ujian
+          Kembali ke Daftar Tes
         </button>
       </div>
     </div>
