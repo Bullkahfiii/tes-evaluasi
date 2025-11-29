@@ -74,7 +74,7 @@ export default function OnlineExamApp() {
       const data = await response.json();
       setExams(data.exams || []);
     } catch (error) {
-      console.error('Gagal memuat ujian:', error);
+      console.error('Gagal memuat tes:', error);
     }
     setLoading(false);
   };
@@ -92,7 +92,7 @@ export default function OnlineExamApp() {
       const data = await response.json();
       
       if (data.completed) {
-        alert(`Anda sudah mengerjakan ujian "${exam.name}"\n\nNilai Anda: ${data.score}\n\nSetiap ujian hanya bisa dikerjakan satu kali.`);
+        alert(`Kamu sudah mengerjakan tes "${exam.name}"\n\nNilai Anda: ${data.score}\n\nSetiap tes hanya bisa dikerjakan satu kali.`);
         setLoading(false);
         return;
       }
@@ -104,7 +104,7 @@ export default function OnlineExamApp() {
       setPage('exam');
     } catch (error) {
       console.error('Error checking exam status:', error);
-      alert('Gagal memeriksa status ujian. Silakan coba lagi.');
+      alert('Gagal memeriksa status tes. Silakan coba lagi.');
     }
     setLoading(false);
   };
@@ -153,15 +153,15 @@ export default function OnlineExamApp() {
         })
       });
       await loadExams();
-      alert('Ujian berhasil disimpan!');
+      alert('Tes berhasil disimpan!');
     } catch (error) {
-      alert('Gagal menyimpan ujian.');
+      alert('Gagal menyimpan tes.');
     }
     setLoading(false);
   };
 
   const handleDeleteExam = async (examName) => {
-    if (confirm(`Hapus ujian "${examName}"?`)) {
+    if (confirm(`Hapus tes "${examName}"?`)) {
       setLoading(true);
       try {
         await fetch(SCRIPT_URL, {
@@ -172,9 +172,9 @@ export default function OnlineExamApp() {
           })
         });
         await loadExams();
-        alert('Ujian berhasil dihapus!');
+        alert('Tes berhasil dihapus!');
       } catch (error) {
-        alert('Gagal menghapus ujian.');
+        alert('Gagal menghapus tes.');
       }
       setLoading(false);
     }
@@ -264,7 +264,7 @@ function LoginPage({ onStudentLogin, onAdminLogin, loading }) {
             <img 
               src="https://res.cloudinary.com/dhsitw8hl/image/upload/v1764392489/NB_merah_cjt2eq.png"
               alt="Logo"
-              className="h-24 w-auto mx-auto"
+              className="h-12 object-contain"
             />
           </div>
           <h1 className="text-3xl font-bold text-red-600 mb-2">Tes Evaluasi</h1>
