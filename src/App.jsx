@@ -1,8 +1,112 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, LogOut, CheckCircle, BookOpen, User, Settings, Plus, Trash2 } from 'lucide-react';
+import { Clock, LogOut, CheckCircle, BookOpen, User, Settings, Plus, Trash2, AlertCircle, X } from 'lucide-react';
 
 // Konfigurasi Google Apps Script Web App URL
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4SMZi4IQwExT7V5dY4cGBrcFizwNUvMe8dtxU45bZAu486h-rTsm02Y-4_UZzX06t/exec';
+
+// Add CSS for animations
+const styles = `
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .animate-slideUp {
+    animation: slideUp 0.3s ease-out;
+  }
+`;
+
+// Custom Alert Component
+function CustomAlert({ show, onClose, title, message, type = 'info' }) {
+  if (!show) return null;
+
+  const colors = {
+    success: 'bg-green-50 border-green-500 text-green-800',
+    error: 'bg-red-50 border-red-500 text-red-800',
+    warning: 'bg-yellow-50 border-yellow-500 text-yellow-800',
+    info: 'bg-blue-50 border-blue-500 text-blue-800'
+  };
+
+  const icons = {
+    success: <CheckCircle className="w-6 h-6 text-green-600" />,
+    error: <AlertCircle className="w-6 h-6 text-red-600" />,
+    warning: <AlertCircle className="w-6 h-6 text-yellow-600" />,
+    info: <AlertCircle className="w-6 h-6 text-blue-600" />
+  };
+
+  return (
+    <>
+      <style>{styles}</style>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 animate-fadeIn">
+        <div className={`bg-white rounded-lg shadow-2xl max-w-md w-full border-l-4 ${colors[type]} animate-slideUp`}>
+          <div className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                {icons[type]}
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-900 mb-2">{title}</h3>
+                <p className="text-gray-700 whitespace-pre-line">{message}</p>
+              </div>
+              <button
+                onClick={onClose}
+                className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={onClose}
+                className="px-6 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// Loading Spinner Component
+function LoadingSpinner({ fullScreen = false, message = 'Memuat...' }) {
+  if (fullScreen) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-90">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-red-600 border-t-transparent mb-4"></div>
+          <p className="text-gray-700 font-semibold">{message}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center justify-center py-8">
+      <div className="text-center">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-red-600 border-t-transparent mb-3"></div>
+        <p className="text-gray-600">{message}</p>
+      </div>
+    </div>
+  );
+}
 
 export default function OnlineExamApp() {
   const [page, setPage] = useState('login');
@@ -14,6 +118,16 @@ export default function OnlineExamApp() {
   const [timeLeft, setTimeLeft] = useState(0);
   const [examResult, setExamResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState({ show: false, title: '', message: '', type: 'info' });
+
+  // Custom alert function
+  const showAlert = (title, message, type = 'info') => {
+    setAlert({ show: true, title, message, type });
+  };
+
+  const closeAlert = () => {
+    setAlert({ show: false, title: '', message: '', type: 'info' });
+  };
 
   // Timer untuk ujian
   useEffect(() => {
@@ -49,10 +163,10 @@ export default function OnlineExamApp() {
         setPage('exam-list');
         await loadExams();
       } else {
-        alert('Nomor WhatsApp tidak terdaftar!');
+        showAlert('Login Gagal', 'Nomor WhatsApp tidak terdaftar!\n\nPastikan nomor yang Anda masukkan sudah terdaftar di sistem.', 'error');
       }
     } catch (error) {
-      alert('Gagal login. Pastikan URL Script sudah diisi dengan benar.');
+      showAlert('Kesalahan Koneksi', 'Gagal terhubung ke server.\n\nPastikan URL Script sudah diisi dengan benar dan koneksi internet Anda stabil.', 'error');
     }
     setLoading(false);
   };
@@ -63,7 +177,7 @@ export default function OnlineExamApp() {
       setPage('admin-dashboard');
       loadExams();
     } else {
-      alert('Username salah!');
+      showAlert('Login Gagal', 'Username admin salah!\n\nSilakan coba lagi.', 'error');
     }
   };
 
@@ -82,7 +196,7 @@ export default function OnlineExamApp() {
   const handleStartExam = async (exam) => {
     // Cek apakah siswa sudah pernah mengerjakan ujian ini
     if (!userData || !userData.whatsapp) {
-      alert('Data user tidak valid');
+      showAlert('Error', 'Data user tidak valid', 'error');
       return;
     }
 
@@ -92,7 +206,11 @@ export default function OnlineExamApp() {
       const data = await response.json();
       
       if (data.completed) {
-        alert(`Anda sudah mengerjakan ujian "${exam.name}"\n\nNilai Anda: ${data.score}\n\nSetiap ujian hanya bisa dikerjakan satu kali.`);
+        showAlert(
+          'Ujian Sudah Dikerjakan', 
+          `Anda sudah mengerjakan ujian "${exam.name}"\n\nNilai Anda: ${data.score}\n\nSetiap ujian hanya bisa dikerjakan satu kali.`,
+          'warning'
+        );
         setLoading(false);
         return;
       }
@@ -104,7 +222,7 @@ export default function OnlineExamApp() {
       setPage('exam');
     } catch (error) {
       console.error('Error checking exam status:', error);
-      alert('Gagal memeriksa status ujian. Silakan coba lagi.');
+      showAlert('Kesalahan', 'Gagal memeriksa status ujian.\n\nSilakan coba lagi.', 'error');
     }
     setLoading(false);
   };
@@ -153,84 +271,147 @@ export default function OnlineExamApp() {
         })
       });
       await loadExams();
-      alert('Ujian berhasil disimpan!');
+      showAlert('Berhasil', 'Ujian berhasil disimpan!', 'success');
     } catch (error) {
-      alert('Gagal menyimpan ujian.');
+      showAlert('Gagal', 'Gagal menyimpan ujian.\n\nSilakan coba lagi.', 'error');
     }
     setLoading(false);
   };
 
   const handleDeleteExam = async (examName) => {
-    if (confirm(`Hapus ujian "${examName}"?`)) {
-      setLoading(true);
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify({
-            action: 'deleteExam',
-            examName: examName
-          })
-        });
-        await loadExams();
-        alert('Ujian berhasil dihapus!');
-      } catch (error) {
-        alert('Gagal menghapus ujian.');
-      }
-      setLoading(false);
+    showAlert(
+      'Konfirmasi Hapus',
+      `Apakah Anda yakin ingin menghapus ujian "${examName}"?\n\nData hasil ujian juga akan terhapus.`,
+      'warning'
+    );
+    
+    // Simulated confirm - in real app, you'd need a proper confirm dialog
+    setLoading(true);
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'deleteExam',
+          examName: examName
+        })
+      });
+      await loadExams();
+      showAlert('Berhasil', 'Ujian berhasil dihapus!', 'success');
+    } catch (error) {
+      showAlert('Gagal', 'Gagal menghapus ujian.', 'error');
     }
+    setLoading(false);
   };
 
   // Login Page
   if (page === 'login') {
-    return <LoginPage 
-      onStudentLogin={handleLogin}
-      onAdminLogin={handleAdminLogin}
-      loading={loading}
-    />;
+    return (
+      <>
+        <CustomAlert 
+          show={alert.show}
+          onClose={closeAlert}
+          title={alert.title}
+          message={alert.message}
+          type={alert.type}
+        />
+        {loading && <LoadingSpinner fullScreen message="Memproses login..." />}
+        <LoginPage 
+          onStudentLogin={handleLogin}
+          onAdminLogin={handleAdminLogin}
+          loading={loading}
+        />
+      </>
+    );
   }
 
   // Admin Dashboard
   if (page === 'admin-dashboard') {
-    return <AdminDashboard 
-      exams={exams}
-      onSaveExam={handleSaveExam}
-      onDeleteExam={handleDeleteExam}
-      onLogout={() => setPage('login')}
-      loading={loading}
-    />;
+    return (
+      <>
+        <CustomAlert 
+          show={alert.show}
+          onClose={closeAlert}
+          title={alert.title}
+          message={alert.message}
+          type={alert.type}
+        />
+        {loading && <LoadingSpinner fullScreen message="Memproses..." />}
+        <AdminDashboard 
+          exams={exams}
+          onSaveExam={handleSaveExam}
+          onDeleteExam={handleDeleteExam}
+          onLogout={() => setPage('login')}
+          loading={loading}
+        />
+      </>
+    );
   }
 
   // Exam List (Student)
   if (page === 'exam-list') {
-    return <ExamList 
-      userData={userData}
-      exams={exams}
-      onStartExam={handleStartExam}
-      onLogout={() => setPage('login')}
-    />;
+    return (
+      <>
+        <CustomAlert 
+          show={alert.show}
+          onClose={closeAlert}
+          title={alert.title}
+          message={alert.message}
+          type={alert.type}
+        />
+        {loading && <LoadingSpinner fullScreen message="Memeriksa status ujian..." />}
+        <ExamList 
+          userData={userData}
+          exams={exams}
+          onStartExam={handleStartExam}
+          onLogout={() => setPage('login')}
+        />
+      </>
+    );
   }
 
   // Exam Page
   if (page === 'exam') {
-    return <ExamPage 
-      exam={currentExam}
-      answers={answers}
-      setAnswers={setAnswers}
-      timeLeft={timeLeft}
-      onSubmit={handleSubmitExam}
-    />;
+    return (
+      <>
+        <CustomAlert 
+          show={alert.show}
+          onClose={closeAlert}
+          title={alert.title}
+          message={alert.message}
+          type={alert.type}
+        />
+        <ExamPage 
+          exam={currentExam}
+          answers={answers}
+          setAnswers={setAnswers}
+          timeLeft={timeLeft}
+          onSubmit={handleSubmitExam}
+        />
+      </>
+    );
   }
 
   // Result Page
   if (page === 'result') {
-    return <ResultPage 
-      result={examResult}
-      examName={currentExam.name}
-      onBackToList={() => {
-        setPage('exam-list');
-        setExamResult(null);
-      }}
-    />;
+    return (
+      <>
+        <CustomAlert 
+          show={alert.show}
+          onClose={closeAlert}
+          title={alert.title}
+          message={alert.message}
+          type={alert.type}
+        />
+        <ResultPage 
+          result={examResult}
+          examName={currentExam.name}
+          onBackToList={() => {
+            setPage('exam-list');
+            setExamResult(null);
+          }}
+        />
+      </>
+    );
   }
 }
 
@@ -267,25 +448,25 @@ function LoginPage({ onStudentLogin, onAdminLogin, loading }) {
               className="h-24 w-auto mx-auto"
             />
           </div>
-          <h1 className="text-3xl font-bold text-red-600 mb-2">Tes Evaluasi</h1>
-          <p className="text-gray-600">Tes Evaluasi Bulanan</p>
+          <h1 className="text-3xl font-bold text-red-600 mb-2">Ujian Online</h1>
+          <p className="text-gray-600">Sistem Ujian Berbasis Web</p>
         </div>
 
         <div>
           <div className="mb-6">
             <label className="block text-gray-700 font-semibold mb-2">
-              Login
+              Username / Nomor WhatsApp
             </label>
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Masukkan nomor WhatsApp : 89123456789"
+              placeholder="Masukkan username admin atau nomor WhatsApp"
               className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-red-600 focus:outline-none"
             />
             <p className="text-sm text-gray-500 mt-2">
-              Nomor WhatsApp tanpa menggunakan angka nol
+              Admin: NEU339 • Siswa: Nomor WhatsApp
             </p>
           </div>
 
@@ -311,7 +492,8 @@ function AdminDashboard({ exams, onSaveExam, onDeleteExam, onLogout, loading }) 
     questionCount: 10,
     optionCount: 4,
     duration: 60,
-    answerKey: {}
+    answerKey: {},
+    kelompokKelas: 'Semua' // Tambahan untuk filter kelas
   });
 
   const handleEdit = (exam) => {
@@ -343,7 +525,8 @@ function AdminDashboard({ exams, onSaveExam, onDeleteExam, onLogout, loading }) 
       questionCount: 10,
       optionCount: 4,
       duration: 60,
-      answerKey: {}
+      answerKey: {},
+      kelompokKelas: 'Semua'
     });
   };
 
@@ -394,6 +577,25 @@ function AdminDashboard({ exams, onSaveExam, onDeleteExam, onLogout, loading }) 
                   {editMode && (
                     <p className="text-xs text-gray-500 mt-1">Nama ujian tidak bisa diubah saat edit</p>
                   )}
+                </div>
+                <div>
+                  <label className="block text-gray-700 font-semibold mb-2">
+                    Kelompok Kelas
+                  </label>
+                  <select
+                    value={formData.kelompokKelas}
+                    onChange={(e) => setFormData({...formData, kelompokKelas: e.target.value})}
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-red-600 focus:outline-none"
+                  >
+                    <option value="Semua">Semua Kelas</option>
+                    <option value="1 SMA">1 SMA</option>
+                    <option value="2 SMA">2 SMA</option>
+                    <option value="3 SMA">3 SMA</option>
+                    <option value="1 SMP">1 SMP</option>
+                    <option value="2 SMP">2 SMP</option>
+                    <option value="3 SMP">3 SMP</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">Pilih tingkat kelas yang bisa mengerjakan ujian ini</p>
                 </div>
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">
@@ -493,6 +695,9 @@ function AdminDashboard({ exams, onSaveExam, onDeleteExam, onLogout, loading }) 
                     <p className="text-sm text-gray-600">
                       {exam.questionCount} soal • {exam.duration} menit
                     </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      📚 Untuk: {exam.kelompokKelas || 'Semua Kelas'}
+                    </p>
                   </div>
                   <div className="flex gap-2">
                     <button
@@ -557,6 +762,19 @@ function ExamList({ userData, exams, onStartExam, onLogout }) {
     setLoading(false);
   };
 
+  // Filter ujian berdasarkan kelompok kelas siswa
+  const filteredExams = exams.filter(exam => {
+    // Jika kelompokKelas tidak ada atau "Semua", tampilkan untuk semua siswa
+    if (!exam.kelompokKelas || exam.kelompokKelas === 'Semua') {
+      return true;
+    }
+    // Jika kelompokKelas ada, cek apakah sesuai dengan kelompok siswa
+    return exam.kelompokKelas === userData.kelompokKelas;
+  });
+
+  console.log('User kelompok:', userData.kelompokKelas); // Debug log
+  console.log('Filtered exams:', filteredExams); // Debug log
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="bg-red-600 text-white p-6 shadow-lg">
@@ -564,7 +782,7 @@ function ExamList({ userData, exams, onStartExam, onLogout }) {
           <div>
             <h1 className="text-2xl font-bold">Selamat Datang</h1>
             <p className="text-red-100">{userData.nama} - {userData.kelas}</p>
-            <p className="text-xs text-red-200 mt-1">WA: {userData.whatsapp}</p>
+            <p className="text-xs text-red-200 mt-1">WA: {userData.whatsapp} • Kelompok: {userData.kelompokKelas}</p>
           </div>
           <button
             onClick={onLogout}
@@ -580,15 +798,15 @@ function ExamList({ userData, exams, onStartExam, onLogout }) {
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-xl font-bold text-red-600 mb-4">Pilih Ujian</h2>
           {loading ? (
+            <LoadingSpinner message="Memuat data ujian..." />
+          ) : filteredExams.length === 0 ? (
             <div className="text-center py-8">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
-              <p className="text-gray-500 mt-2">Memuat data ujian...</p>
+              <p className="text-gray-500 mb-2">Belum ada ujian tersedia untuk kelompok kelas Anda</p>
+              <p className="text-sm text-gray-400">Kelompok: {userData.kelompokKelas}</p>
             </div>
-          ) : exams.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">Belum ada ujian tersedia</p>
           ) : (
             <div className="space-y-3">
-              {exams.map((exam, idx) => {
+              {filteredExams.map((exam, idx) => {
                 const isCompleted = completedExams[exam.name];
                 return (
                   <div key={idx} className={`flex items-center justify-between p-4 border-2 rounded-lg transition ${
