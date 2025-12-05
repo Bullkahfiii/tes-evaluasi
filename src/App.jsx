@@ -188,7 +188,7 @@ export default function OnlineExamApp() {
       const data = await response.json();
       setExams(data.exams || []);
     } catch (error) {
-      console.error('Gagal memuat tes:', error);
+      console.error('Gagal memuat ujian:', error);
     }
     setLoading(false);
   };
@@ -206,15 +206,11 @@ export default function OnlineExamApp() {
       const data = await response.json();
       
       if (data.completed) {
-<<<<<<< HEAD
         showAlert(
           'Ujian Sudah Dikerjakan', 
-          `Anda sudah mengerjakan ujian "${exam.name}"\n\nNilai Anda: ${data.score}\n\nSetiap ujian hanya bisa dikerjakan satu kali.`,
+          `Anda sudah mengerjakan tes "${exam.name}"\n\nNilai Anda: ${data.score}\n\nSetiap tes hanya bisa dikerjakan satu kali.`,
           'warning'
         );
-=======
-        alert(`Kamu sudah mengerjakan tes "${exam.name}"\n\nNilai Anda: ${data.score}\n\nSetiap tes hanya bisa dikerjakan satu kali.`);
->>>>>>> b1b7af35537e0c08b09e5aabc233af1725bd874f
         setLoading(false);
         return;
       }
@@ -226,18 +222,15 @@ export default function OnlineExamApp() {
       setPage('exam');
     } catch (error) {
       console.error('Error checking exam status:', error);
-<<<<<<< HEAD
       showAlert('Kesalahan', 'Gagal memeriksa status ujian.\n\nSilakan coba lagi.', 'error');
-=======
-      alert('Gagal memeriksa status tes. Silakan coba lagi.');
->>>>>>> b1b7af35537e0c08b09e5aabc233af1725bd874f
     }
     setLoading(false);
   };
 
   const handleSubmitExam = async () => {
+    setLoading(true); // Tampilkan loading saat submit
+    
     const score = calculateScore();
-    setExamResult({ score, total: currentExam.questionCount });
     
     // Kirim hasil ke spreadsheet
     try {
@@ -251,11 +244,20 @@ export default function OnlineExamApp() {
           total: currentExam.questionCount
         })
       });
+      
+      // Simulasi delay untuk menunjukkan proses
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setExamResult({ score, total: currentExam.questionCount });
+      setLoading(false);
+      setPage('result');
     } catch (error) {
       console.error('Gagal menyimpan hasil:', error);
+      setLoading(false);
+      showAlert('Kesalahan', 'Gagal menyimpan hasil ujian.\n\nNamun Anda tetap bisa melihat nilai Anda.', 'warning');
+      setExamResult({ score, total: currentExam.questionCount });
+      setPage('result');
     }
-    
-    setPage('result');
   };
 
   const calculateScore = () => {
@@ -279,24 +281,17 @@ export default function OnlineExamApp() {
         })
       });
       await loadExams();
-<<<<<<< HEAD
-      showAlert('Berhasil', 'Ujian berhasil disimpan!', 'success');
+      showAlert('Berhasil', 'Tes berhasil disimpan!', 'success');
     } catch (error) {
-      showAlert('Gagal', 'Gagal menyimpan ujian.\n\nSilakan coba lagi.', 'error');
-=======
-      alert('Tes berhasil disimpan!');
-    } catch (error) {
-      alert('Gagal menyimpan tes.');
->>>>>>> b1b7af35537e0c08b09e5aabc233af1725bd874f
+      showAlert('Gagal', 'Gagal menyimpan tes.\n\nSilakan coba lagi.', 'error');
     }
     setLoading(false);
   };
 
   const handleDeleteExam = async (examName) => {
-<<<<<<< HEAD
     showAlert(
       'Konfirmasi Hapus',
-      `Apakah Anda yakin ingin menghapus ujian "${examName}"?\n\nData hasil ujian juga akan terhapus.`,
+      `Apakah Anda yakin ingin menghapus tes "${examName}"?\n\nData hasil ujian juga akan terhapus.`,
       'warning'
     );
     
@@ -314,24 +309,6 @@ export default function OnlineExamApp() {
       showAlert('Berhasil', 'Ujian berhasil dihapus!', 'success');
     } catch (error) {
       showAlert('Gagal', 'Gagal menghapus ujian.', 'error');
-=======
-    if (confirm(`Hapus tes "${examName}"?`)) {
-      setLoading(true);
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify({
-            action: 'deleteExam',
-            examName: examName
-          })
-        });
-        await loadExams();
-        alert('Tes berhasil dihapus!');
-      } catch (error) {
-        alert('Gagal menghapus tes.');
-      }
-      setLoading(false);
->>>>>>> b1b7af35537e0c08b09e5aabc233af1725bd874f
     }
     setLoading(false);
   };
@@ -413,6 +390,7 @@ export default function OnlineExamApp() {
           message={alert.message}
           type={alert.type}
         />
+        {loading && <LoadingSpinner fullScreen message="Menyimpan hasil tes..." />}
         <ExamPage 
           exam={currentExam}
           answers={answers}
@@ -481,30 +459,25 @@ function LoginPage({ onStudentLogin, onAdminLogin, loading }) {
               className="h-12 object-contain"
             />
           </div>
-<<<<<<< HEAD
-          <h1 className="text-3xl font-bold text-red-600 mb-2">Ujian Online</h1>
-          <p className="text-gray-600">Sistem Ujian Berbasis Web</p>
-=======
           <h1 className="text-3xl font-bold text-red-600 mb-2">Tes Evaluasi</h1>
-          <p className="text-gray-600">Jangan takut salah, takutlah kalau kamu tidak mencoba sama sekali.</p>
->>>>>>> b1b7af35537e0c08b09e5aabc233af1725bd874f
+          <p className="text-gray-600"><i>Jangan takut salah, takutlah kalau kamu tidak mencoba sama sekali.</i></p>
         </div>
 
         <div>
           <div className="mb-6">
             <label className="block text-gray-700 font-semibold mb-2">
-              Username / Nomor WhatsApp
+              Login
             </label>
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Masukkan username admin atau nomor WhatsApp"
+              placeholder="Masukkan nomor WhatsApp : 8912345678"
               className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-red-600 focus:outline-none"
             />
             <p className="text-sm text-gray-500 mt-2">
-              Admin: NEU339 • Siswa: Nomor WhatsApp
+              Nomor WhatsApp tanpa angka nol
             </p>
           </div>
 
@@ -613,7 +586,7 @@ function AdminDashboard({ exams, onSaveExam, onDeleteExam, onLogout, loading }) 
                     disabled={editMode}
                   />
                   {editMode && (
-                    <p className="text-xs text-gray-500 mt-1">Nama ujian tidak bisa diubah saat edit</p>
+                    <p className="text-xs text-gray-500 mt-1">Nama tes tidak bisa diubah saat edit</p>
                   )}
                 </div>
                 <div>
@@ -633,7 +606,7 @@ function AdminDashboard({ exams, onSaveExam, onDeleteExam, onLogout, loading }) 
                     <option value="2 SMP">2 SMP</option>
                     <option value="3 SMP">3 SMP</option>
                   </select>
-                  <p className="text-xs text-gray-500 mt-1">Pilih tingkat kelas yang bisa mengerjakan ujian ini</p>
+                  <p className="text-xs text-gray-500 mt-1">Pilih tingkat kelas yang bisa mengerjakan tes ini</p>
                 </div>
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">
@@ -678,26 +651,51 @@ function AdminDashboard({ exams, onSaveExam, onDeleteExam, onLogout, loading }) 
                 <label className="block text-gray-700 font-semibold mb-2">
                   Kunci Jawaban
                 </label>
+                <p className="text-sm text-gray-600 mb-3">
+                  Pilih jawaban yang benar untuk setiap nomor soal. Biarkan kosong (-) jika belum tahu.
+                </p>
                 <div className="grid grid-cols-5 gap-2">
-                  {Array.from({length: formData.questionCount}, (_, i) => i + 1).map(num => (
-                    <div key={num} className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-gray-600 w-8">{num}.</span>
-                      <select
-                        value={formData.answerKey[num] || 'A'}
-                        onChange={(e) => setFormData({
-                          ...formData, 
-                          answerKey: {...formData.answerKey, [num]: e.target.value}
-                        })}
-                        className="flex-1 px-2 py-1 border-2 border-gray-300 rounded focus:border-red-600 focus:outline-none"
-                      >
-                        {Array.from({length: formData.optionCount}, (_, i) => 
-                          String.fromCharCode(65 + i)
-                        ).map(option => (
-                          <option key={option} value={option}>{option}</option>
-                        ))}
-                      </select>
-                    </div>
-                  ))}
+                  {Array.from({length: formData.questionCount}, (_, i) => i + 1).map(num => {
+                    const isFilled = formData.answerKey[num] && formData.answerKey[num] !== '';
+                    return (
+                      <div key={num} className="flex items-center gap-2">
+                        <span className={`text-sm font-semibold w-8 ${isFilled ? 'text-green-600' : 'text-gray-400'}`}>
+                          {isFilled ? '✓' : '•'} {num}.
+                        </span>
+                        <select
+                          value={formData.answerKey[num] || ''}
+                          onChange={(e) => setFormData({
+                            ...formData, 
+                            answerKey: {...formData.answerKey, [num]: e.target.value}
+                          })}
+                          className={`flex-1 px-2 py-1 border-2 rounded focus:outline-none ${
+                            isFilled 
+                              ? 'border-green-300 bg-green-50 focus:border-green-600' 
+                              : 'border-gray-300 focus:border-red-600'
+                          }`}
+                        >
+                          <option value="">-</option>
+                          {Array.from({length: formData.optionCount}, (_, i) => 
+                            String.fromCharCode(65 + i)
+                          ).map(option => (
+                            <option key={option} value={option}>{option}</option>
+                          ))}
+                        </select>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-3 flex items-center justify-between text-sm">
+                  <p className="text-gray-500">
+                    💡 Tips: Pastikan semua soal sudah terisi kunci jawabannya
+                  </p>
+                  <p className={`font-semibold ${
+                    Object.keys(formData.answerKey).filter(k => formData.answerKey[k]).length === formData.questionCount
+                      ? 'text-green-600'
+                      : 'text-orange-600'
+                  }`}>
+                    {Object.keys(formData.answerKey).filter(k => formData.answerKey[k]).length}/{formData.questionCount} terisi
+                  </p>
                 </div>
               </div>
 
@@ -741,14 +739,14 @@ function AdminDashboard({ exams, onSaveExam, onDeleteExam, onLogout, loading }) 
                     <button
                       onClick={() => handleEdit(exam)}
                       className="text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition"
-                      title="Edit Ujian"
+                      title="Edit Tes"
                     >
                       <Settings className="w-5 h-5" />
                     </button>
                     <button
                       onClick={() => onDeleteExam(exam.name)}
                       className="text-red-600 hover:bg-red-50 p-2 rounded-lg transition"
-                      title="Hapus Ujian"
+                      title="Hapus Tes"
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>
@@ -834,22 +832,14 @@ function ExamList({ userData, exams, onStartExam, onLogout }) {
 
       <div className="max-w-4xl mx-auto p-6">
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-xl font-bold text-red-600 mb-4">Pilih Tes</h2>
+          <h2 className="text-xl font-bold text-red-600 mb-4">Pilih Ujian</h2>
           {loading ? (
             <LoadingSpinner message="Memuat data ujian..." />
           ) : filteredExams.length === 0 ? (
             <div className="text-center py-8">
-<<<<<<< HEAD
-              <p className="text-gray-500 mb-2">Belum ada ujian tersedia untuk kelompok kelas Anda</p>
+              <p className="text-gray-500 mb-2">Belum ada tes yang tersedia untuk kelompok kelas Kamu</p>
               <p className="text-sm text-gray-400">Kelompok: {userData.kelompokKelas}</p>
             </div>
-=======
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
-              <p className="text-gray-500 mt-2">Memuat data tes...</p>
-            </div>
-          ) : exams.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">Belum ada tes yang tersedia</p>
->>>>>>> b1b7af35537e0c08b09e5aabc233af1725bd874f
           ) : (
             <div className="space-y-3">
               {filteredExams.map((exam, idx) => {
