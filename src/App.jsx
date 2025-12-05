@@ -188,7 +188,7 @@ export default function OnlineExamApp() {
       const data = await response.json();
       setExams(data.exams || []);
     } catch (error) {
-      console.error('Gagal memuat ujian:', error);
+      console.error('Gagal memuat tes:', error);
     }
     setLoading(false);
   };
@@ -206,11 +206,15 @@ export default function OnlineExamApp() {
       const data = await response.json();
       
       if (data.completed) {
+<<<<<<< HEAD
         showAlert(
           'Ujian Sudah Dikerjakan', 
           `Anda sudah mengerjakan ujian "${exam.name}"\n\nNilai Anda: ${data.score}\n\nSetiap ujian hanya bisa dikerjakan satu kali.`,
           'warning'
         );
+=======
+        alert(`Kamu sudah mengerjakan tes "${exam.name}"\n\nNilai Anda: ${data.score}\n\nSetiap tes hanya bisa dikerjakan satu kali.`);
+>>>>>>> b1b7af35537e0c08b09e5aabc233af1725bd874f
         setLoading(false);
         return;
       }
@@ -222,7 +226,11 @@ export default function OnlineExamApp() {
       setPage('exam');
     } catch (error) {
       console.error('Error checking exam status:', error);
+<<<<<<< HEAD
       showAlert('Kesalahan', 'Gagal memeriksa status ujian.\n\nSilakan coba lagi.', 'error');
+=======
+      alert('Gagal memeriksa status tes. Silakan coba lagi.');
+>>>>>>> b1b7af35537e0c08b09e5aabc233af1725bd874f
     }
     setLoading(false);
   };
@@ -271,14 +279,21 @@ export default function OnlineExamApp() {
         })
       });
       await loadExams();
+<<<<<<< HEAD
       showAlert('Berhasil', 'Ujian berhasil disimpan!', 'success');
     } catch (error) {
       showAlert('Gagal', 'Gagal menyimpan ujian.\n\nSilakan coba lagi.', 'error');
+=======
+      alert('Tes berhasil disimpan!');
+    } catch (error) {
+      alert('Gagal menyimpan tes.');
+>>>>>>> b1b7af35537e0c08b09e5aabc233af1725bd874f
     }
     setLoading(false);
   };
 
   const handleDeleteExam = async (examName) => {
+<<<<<<< HEAD
     showAlert(
       'Konfirmasi Hapus',
       `Apakah Anda yakin ingin menghapus ujian "${examName}"?\n\nData hasil ujian juga akan terhapus.`,
@@ -299,6 +314,24 @@ export default function OnlineExamApp() {
       showAlert('Berhasil', 'Ujian berhasil dihapus!', 'success');
     } catch (error) {
       showAlert('Gagal', 'Gagal menghapus ujian.', 'error');
+=======
+    if (confirm(`Hapus tes "${examName}"?`)) {
+      setLoading(true);
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'deleteExam',
+            examName: examName
+          })
+        });
+        await loadExams();
+        alert('Tes berhasil dihapus!');
+      } catch (error) {
+        alert('Gagal menghapus tes.');
+      }
+      setLoading(false);
+>>>>>>> b1b7af35537e0c08b09e5aabc233af1725bd874f
     }
     setLoading(false);
   };
@@ -445,11 +478,16 @@ function LoginPage({ onStudentLogin, onAdminLogin, loading }) {
             <img 
               src="https://res.cloudinary.com/dhsitw8hl/image/upload/v1764392489/NB_merah_cjt2eq.png"
               alt="Logo"
-              className="h-24 w-auto mx-auto"
+              className="h-12 object-contain"
             />
           </div>
+<<<<<<< HEAD
           <h1 className="text-3xl font-bold text-red-600 mb-2">Ujian Online</h1>
           <p className="text-gray-600">Sistem Ujian Berbasis Web</p>
+=======
+          <h1 className="text-3xl font-bold text-red-600 mb-2">Tes Evaluasi</h1>
+          <p className="text-gray-600">Jangan takut salah, takutlah kalau kamu tidak mencoba sama sekali.</p>
+>>>>>>> b1b7af35537e0c08b09e5aabc233af1725bd874f
         </div>
 
         <div>
@@ -534,7 +572,7 @@ function AdminDashboard({ exams, onSaveExam, onDeleteExam, onLogout, loading }) 
     <div className="min-h-screen bg-gray-100">
       <div className="bg-red-600 text-white p-6 shadow-lg">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Dashboard Admin</h1>
+          <h1 className="text-2xl font-bold">Bubat Hebat</h1>
           <button
             onClick={onLogout}
             className="flex items-center gap-2 bg-white text-red-600 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
@@ -552,7 +590,7 @@ function AdminDashboard({ exams, onSaveExam, onDeleteExam, onLogout, loading }) 
             className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition flex items-center gap-2"
           >
             <Plus className="w-5 h-5" />
-            Buat Ujian Baru
+            Buat Tes Baru
           </button>
         </div>
 
@@ -565,7 +603,7 @@ function AdminDashboard({ exams, onSaveExam, onDeleteExam, onLogout, loading }) 
               <div className="grid md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">
-                    Nama Ujian
+                    Nama Tes
                   </label>
                   <input
                     type="text"
@@ -683,9 +721,9 @@ function AdminDashboard({ exams, onSaveExam, onDeleteExam, onLogout, loading }) 
         )}
 
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-xl font-bold text-red-600 mb-4">Daftar Ujian</h2>
+          <h2 className="text-xl font-bold text-red-600 mb-4">Daftar Tes</h2>
           {exams.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">Belum ada ujian dibuat</p>
+            <p className="text-gray-500 text-center py-8">Belum ada tes yang dibuat</p>
           ) : (
             <div className="space-y-3">
               {exams.map((exam, idx) => (
@@ -796,14 +834,22 @@ function ExamList({ userData, exams, onStartExam, onLogout }) {
 
       <div className="max-w-4xl mx-auto p-6">
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-xl font-bold text-red-600 mb-4">Pilih Ujian</h2>
+          <h2 className="text-xl font-bold text-red-600 mb-4">Pilih Tes</h2>
           {loading ? (
             <LoadingSpinner message="Memuat data ujian..." />
           ) : filteredExams.length === 0 ? (
             <div className="text-center py-8">
+<<<<<<< HEAD
               <p className="text-gray-500 mb-2">Belum ada ujian tersedia untuk kelompok kelas Anda</p>
               <p className="text-sm text-gray-400">Kelompok: {userData.kelompokKelas}</p>
             </div>
+=======
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
+              <p className="text-gray-500 mt-2">Memuat data tes...</p>
+            </div>
+          ) : exams.length === 0 ? (
+            <p className="text-gray-500 text-center py-8">Belum ada tes yang tersedia</p>
+>>>>>>> b1b7af35537e0c08b09e5aabc233af1725bd874f
           ) : (
             <div className="space-y-3">
               {filteredExams.map((exam, idx) => {
@@ -919,7 +965,7 @@ function ResultPage({ result, examName, onBackToList }) {
           <CheckCircle className="w-16 h-16 text-green-600" />
         </div>
         
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">Ujian Selesai!</h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">Tes Selesai!</h1>
         <p className="text-gray-600 mb-6">{examName}</p>
         
         <div className="bg-red-50 rounded-lg p-6 mb-6">
@@ -935,7 +981,7 @@ function ResultPage({ result, examName, onBackToList }) {
           onClick={onBackToList}
           className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition"
         >
-          Kembali ke Daftar Ujian
+          Kembali ke Daftar Tes
         </button>
       </div>
     </div>
